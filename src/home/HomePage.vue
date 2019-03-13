@@ -1,17 +1,15 @@
 <template>
 <div>
-    <div id="login">
+    <div id="login" v-if!="this.isConnected">
         <h1>Looppie is a Fun Survey you can play with your friends</h1>
-        <h1>Login with your google account</h1>
-    <div class="g-signin2" data-onsuccess="onSignIn"></div>
+        <h2>Login with your facebook account</h2>
     </div>
-    <div class="data">
-        <p>Welcome to Looppie</p>
-        <img id="pic" class="img-circle" width="100" height="100">
+    <div class="data" v-if="this.isConnected">
+        <h2>Welcome to Looppie</h2>
         <div id="menu">
             <div id="profile">
-                <p id="name"></p>
-                <p id="email"></p>
+                <img id="pic" width="100" height="100">
+                <span id="name"></span>
             </div>
             <router-link to="/question" class="menuLink">
             <img src="../assets/pie.png" alt="explore" width="20" height="20"/>
@@ -29,16 +27,50 @@
             <img src="../assets/pie.png" alt="submit" width="20" height="20"/>
             My Records
             </router-link><br>
-            <img src="../assets/pie.png" alt="submit" width="20" height="20"/>
-            <span onclick="signOut()" class="btn btn-danger"> SignOut</span>
         </div>
     </div>
+    <facebook-login class="button"
+      appId="1191320394368306"
+      @login="onLogin"
+      @logout="onLogout"
+      @sdk-loaded="sdkloaded">
+    </facebook-login>
 </div>
 </template>
 
 <script>
+import facebookLogin from 'facebook-login-vuejs';
+ 
 export default {
-  name: 'HomePage'
+  name: "HomePage",
+  components: { 
+      facebookLogin
+    },
+  methods: { 
+    getUserData() {
+      this.FB.api('/me', 'GET', { fields: 'id,name,email' },
+        userInformation => {
+          console.warn("get data from fb",userInformation)
+          this.personalID = userInformation.id;
+          this.email = userInformation.email;
+          this.name = userInformation.name;
+        }
+      )
+    },
+    sdkloaded(payload) {
+      this.isConnected = payload.isConnected
+      this.FB = payload.FB
+      if (this.isConnected) this.getUserData()
+    },
+    onLogin() {
+      this.isConnected = true
+      this.getUserData();
+
+    },
+    onLogout() {
+      this.isConnected = false;
+    }
+  }
 }
 </script>
 
@@ -46,6 +78,7 @@ export default {
 <style scoped>
 #login{
     margin: 200px auto;
+    margin-bottom: 0px;
     display: block;
     text-align:center;
 
@@ -54,7 +87,6 @@ export default {
     margin-left: 450px;
 }
 .data{
-    display: block;
     text-align: center;
 }
 #pic{
@@ -73,4 +105,12 @@ export default {
   text-decoration:none;
   color: black;
 }
+.button {
+    margin-top: 20px;
+    margin-left: 400px;
+}
+template {
+    text-align: center;
+}
+
 </style>
