@@ -1,10 +1,10 @@
 <template>
 <div>
-    <div id="login" v-if!="this.isConnected">
+    <div id="login">
         <h1>Looppie is a Fun Survey you can play with your friends</h1>
         <h2>Login with your facebook account</h2>
     </div>
-    <div class="data" v-if="this.isConnected">
+    <div class="data">
         <h2>Welcome to Looppie</h2>
         <div id="menu">
             <div id="profile">
@@ -70,7 +70,7 @@ export default {
     onLogout() {
       this.isConnected = false;
     }
-  }
+  },
 }
 </script>
 
@@ -88,6 +88,7 @@ export default {
 }
 .data{
     text-align: center;
+    display: none;
 }
 #pic{
     position: relative;
